@@ -16,7 +16,7 @@ import java.util.Scanner;
 public class MovieDBAPI_Wrapper {
 //
 //    private final String GET_MOVIE_POPULAR = "http://api.themoviedb.org/3/movie/popular?api_key=";
-//    private final String GET_MOVIE_TOP_RATED = "https://api.themoviedb.org/3/movie/top_rated?api_key=98ff9a55378b9f07827a7dc0925d7d77";
+//    private final String GET_MOVIE_TOP_RATED = "https://api.themoviedb.org/3/movie/top_rated?api_key=";
 
     public static URL buildURL(String movieData){
         URL url = null;
