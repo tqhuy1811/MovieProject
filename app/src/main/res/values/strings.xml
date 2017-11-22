@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MovieProject</string>
+    <string name="poster_image">PosterImage</string>
+</resources>
