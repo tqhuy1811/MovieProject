@@ -22,7 +22,7 @@ public class MovieDBAPI_Wrapper {
         URL url = null;
         try{
             url = new URL(movieData);
-            Log.i("info", String.valueOf(url));
+
         }catch (MalformedURLException e){
             e.printStackTrace();
         }
@@ -36,9 +36,7 @@ public class MovieDBAPI_Wrapper {
             Scanner scanner = new Scanner(in);
             scanner.useDelimiter("\\A");
             boolean hasInput = scanner.hasNext();
-            Log.i("info",String.valueOf(hasInput));
             if(hasInput){
-                Log.i("info",scanner.next());
                 return scanner.next();
             }
             else{

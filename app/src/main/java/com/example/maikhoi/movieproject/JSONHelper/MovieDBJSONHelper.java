@@ -14,12 +14,7 @@ import java.net.HttpURLConnection;
 public class MovieDBJSONHelper {
 
     public static String[] getDataFromMovieDB(Context context, String movieJson) throws JSONException{
-        if(movieJson != null){
-            Log.i("info", movieJson);
-        }
-        else{
-            Log.i("info","empty");
-        }
+
         final String Movie_Data = "results";
         final String Release_Date = "release_date";
         final String Movie_Vote_Average = "vote_average";
@@ -41,8 +36,8 @@ public class MovieDBJSONHelper {
             over_view = display_movie_data.getString(Movei_Overview);
             poster_image = display_movie_data.getString(Movie_Poster);
 
-            parsedMovieData[i] = vote_average+ " - " + release_date + " - " + over_view
-                                    + " - " + poster_image;
+            parsedMovieData[i] = poster_image;
+//                    + " - " + vote_average + " - " +  release_date + " - " + over_view;
 
 
         }
