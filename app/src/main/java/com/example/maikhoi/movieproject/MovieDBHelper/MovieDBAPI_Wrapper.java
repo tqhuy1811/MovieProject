@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.maikhoi.movieproject.BuildConfig;
 import com.example.maikhoi.movieproject.DiscoveryScreen;
 import com.example.maikhoi.movieproject.R;
 
@@ -19,11 +20,11 @@ import java.util.Scanner;
  */
 
 public class MovieDBAPI_Wrapper {
-//
+    private final static String api = BuildConfig.API_KEY;
 
 
     public static URL buildURL(String movieData,Context context){
-        String api = context.getString(R.string.API_MOVIE_DATABASE);
+
         Uri builtUi = Uri.parse(movieData).buildUpon().appendQueryParameter("api_key",api).build();
         URL url = null;
         try{

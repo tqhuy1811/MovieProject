@@ -32,7 +32,7 @@ public class DetailView extends AppCompatActivity {
             release_date.setText(data.releaseDate);
 
             plot.setText(data.plot);
-            original_title.setText(data.original_title);
+            original_title.setText(data.originalTitle);
             userRating.setText(data.userRating);
         }
         }
