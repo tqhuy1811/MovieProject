@@ -2,6 +2,8 @@ package com.example.maikhoi.movieproject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ public class DiscoveryScreen extends AppCompatActivity implements MoviePosterAda
     private GridLayoutManager layoutManager;
     private MoviePosterAdapter movieAdapter;
     private String choice;
+    private boolean internetState;
 
     private final static String apiPopular = "http://api.themoviedb.org/3/movie/popular?";
     private final static String apiTopRated = "http://api.themoviedb.org/3/movie/top_rated?";
@@ -35,6 +38,7 @@ public class DiscoveryScreen extends AppCompatActivity implements MoviePosterAda
         setTitle("Pop Movie");
         recyclerView = findViewById(R.id.recycler_view);
         layoutManager = new GridLayoutManager(DiscoveryScreen.this, 2);
+        internetState =checkInternetConnection();
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -73,7 +77,19 @@ public class DiscoveryScreen extends AppCompatActivity implements MoviePosterAda
 
 
     private void printData(String api) {
-        new FetchData(this,new  newAsyncTask()).execute(api);
+        if(internetState){new FetchData(this,new  newAsyncTask()).execute(api);}
+    }
+
+    private boolean checkInternetConnection(){
+        Context context = DiscoveryScreen.this;
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
+
     }
 
     @Override
