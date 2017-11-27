@@ -1,6 +1,11 @@
 package com.example.maikhoi.movieproject.MovieDBHelper;
 
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
+
+import com.example.maikhoi.movieproject.DiscoveryScreen;
+import com.example.maikhoi.movieproject.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,13 +20,14 @@ import java.util.Scanner;
 
 public class MovieDBAPI_Wrapper {
 //
-//    private final String GET_MOVIE_POPULAR = "http://api.themoviedb.org/3/movie/popular?api_key=";
-//    private final String GET_MOVIE_TOP_RATED = "https://api.themoviedb.org/3/movie/top_rated?api_key=";
 
-    public static URL buildURL(String movieData){
+
+    public static URL buildURL(String movieData,Context context){
+        String api = context.getString(R.string.API_MOVIE_DATABASE);
+        Uri builtUi = Uri.parse(movieData).buildUpon().appendQueryParameter("api_key",api).build();
         URL url = null;
         try{
-            url = new URL(movieData);
+            url = new URL(builtUi.toString());
 
         }catch (MalformedURLException e){
             e.printStackTrace();

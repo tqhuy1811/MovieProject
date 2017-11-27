@@ -20,6 +20,7 @@ public class DetailView extends AppCompatActivity {
         setContentView(R.layout.activity_detail_view);
         poster_display =  findViewById(R.id.movie_poster_detail);
         release_date = findViewById(R.id.date_release_display);
+
         plot = findViewById(R.id.plot_synopsis);
         original_title = findViewById(R.id.original_title);
         userRating = findViewById(R.id.user_rating);
@@ -29,6 +30,7 @@ public class DetailView extends AppCompatActivity {
         if(data!=null){
             Picasso.with(this).load("http://image.tmdb.org/t/p/w342/"+data.imageLink).into(poster_display);
             release_date.setText(data.releaseDate);
+
             plot.setText(data.plot);
             original_title.setText(data.original_title);
             userRating.setText(data.userRating);

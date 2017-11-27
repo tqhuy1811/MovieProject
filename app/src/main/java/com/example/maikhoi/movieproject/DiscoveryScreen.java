@@ -19,13 +19,13 @@ import com.squareup.picasso.Picasso;
 import java.net.URL;
 
 public class DiscoveryScreen extends AppCompatActivity implements MoviePosterAdapterOnClickHandler {
-  private RecyclerView recyclerView;
-  private GridLayoutManager layoutManager;
-  private MoviePosterAdapter movieAdapter;
-  private  String choice;
-  //API KEY IS IN THE INFO KEY FILE
-  private final static   String apiPopular= "http://api.themoviedb.org/3/movie/popular?api_key=";
-  private final static  String apiTopRated = "http://api.themoviedb.org/3/movie/top_rated?api_key=";
+    private RecyclerView recyclerView;
+    private GridLayoutManager layoutManager;
+    private MoviePosterAdapter movieAdapter;
+    private String choice;
+
+    private final static String apiPopular = "http://api.themoviedb.org/3/movie/popular?";
+    private final static String apiTopRated = "http://api.themoviedb.org/3/movie/top_rated?";
 
 
     @Override
@@ -33,8 +33,8 @@ public class DiscoveryScreen extends AppCompatActivity implements MoviePosterAda
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery_screen);
         setTitle("Pop Movie");
-        recyclerView =  findViewById(R.id.recycler_view);
-        layoutManager = new GridLayoutManager(DiscoveryScreen.this,2);
+        recyclerView = findViewById(R.id.recycler_view);
+        layoutManager = new GridLayoutManager(DiscoveryScreen.this, 2);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -48,20 +48,20 @@ public class DiscoveryScreen extends AppCompatActivity implements MoviePosterAda
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.sortedmenu,menu);
+        inflater.inflate(R.menu.sortedmenu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.popular_sorted:
-                choice=apiPopular;
+                choice = apiPopular;
                 printData(choice);
                 setTitle("Pop Movie");
                 return true;
             case R.id.top_rated:
-                choice=apiTopRated;
+                choice = apiTopRated;
                 printData(choice);
                 setTitle("Top Rated");
                 return true;
@@ -72,46 +72,26 @@ public class DiscoveryScreen extends AppCompatActivity implements MoviePosterAda
     }
 
 
-
     private void printData(String api) {
-        new testing().execute(api);
+        new FetchData(this,new  newAsyncTask()).execute(api);
     }
 
     @Override
     public void onClick(MovieData movieData) {
-        Intent intent = new Intent(DiscoveryScreen.this,DetailView.class);
+        Intent intent = new Intent(DiscoveryScreen.this, DetailView.class);
         intent.putExtra("DATA", movieData);
 
         startActivity(intent);
     }
 
-    public class testing extends AsyncTask<String,Void,MovieData[]> {
-
+    public class newAsyncTask implements AsyncTaskCompleteListener<MovieData>{
         @Override
-        protected MovieData[] doInBackground(String... strings) {
-            String url = strings[0];
-
-            URL getURL = MovieDBAPI_Wrapper.buildURL(url);
-            try {
-                String json = MovieDBAPI_Wrapper.getDataFromAPI(getURL);
-
-                MovieData[] array = MovieDBJSONHelper.getDataFromMovieDB(DiscoveryScreen.this,json);
-                return array;
-            }catch (Exception e) {
-            e.printStackTrace();
-            return  null;
-            }
-
-        }
-
-        @Override
-        protected void onPostExecute(MovieData[] strings) {
-            if(strings != null) {
-                movieAdapter.setImageData(strings);
-            }
+        public void onTaskComplete(MovieData[] result) {
+            movieAdapter.setImageData(result);
         }
     }
-    }
+
+}
 
 
 

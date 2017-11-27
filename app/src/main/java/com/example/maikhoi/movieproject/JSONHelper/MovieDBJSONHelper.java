@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 
 public class MovieDBJSONHelper {
 
-    public static MovieData[] getDataFromMovieDB(Context context, String movieJson) throws JSONException{
+    public static MovieData[] getDataFromMovieDB( String movieJson) throws JSONException{
 
         final String Movie_Data = "results";
         final String Release_Date = "release_date";

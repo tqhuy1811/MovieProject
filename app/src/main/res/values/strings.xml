@@ -3,5 +3,6 @@
     <string name="poster_image">PosterImage</string>
     <string name="top_rated">Top Rated</string>
     <string name="most_popular">Most Popular</string>
+    <string name="API_MOVIE_DATABASE">98ff9a55378b9f07827a7dc0925d7d77</string>
 
 </resources>
