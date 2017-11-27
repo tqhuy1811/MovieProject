@@ -7,3 +7,8 @@
 /build
 /captures
 /gradle.properties
+*.properties
+gradle.properties
+gradle.properties
+gradle.properties
+gradle.properties
