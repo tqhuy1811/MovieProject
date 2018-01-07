@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/play_trailer"
+        android:adjustViewBounds="true"
+        android:background="@mipmap/play_button_round"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="13sp"
+        android:id="@+id/movie_trailer_name"
+        android:layout_toRightOf="@id/play_trailer"
+        android:paddingLeft="10dp"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#dadada"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_below="@id/play_trailer"/>
+
+
+</RelativeLayout>

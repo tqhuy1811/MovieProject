@@ -12,19 +12,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DiscoveryScreen">
+        <activity android:name=".DiscoveryScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailView"
-            android:parentActivityName=".DiscoveryScreen">
+        <activity android:name=".DetailViewActivity"
+            android:parentActivityName=".DiscoveryScreenActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".DiscoveryScreen"/>
+                android:value=".DiscoveryScreenActivity"/>
         </activity>
+        <provider
+            android:authorities="com.example.maikhoi.movieproject"
+            android:name=".MovieDBHelper.MovieContentProvider"
+            android:exported="false"/>
     </application>
+
 
 </manifest>

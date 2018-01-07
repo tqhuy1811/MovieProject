@@ -2,11 +2,8 @@ package com.example.maikhoi.movieproject.MovieDBHelper;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.example.maikhoi.movieproject.BuildConfig;
-import com.example.maikhoi.movieproject.DiscoveryScreen;
-import com.example.maikhoi.movieproject.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,19 +19,41 @@ import java.util.Scanner;
 public class MovieDBAPI_Wrapper {
     private final static String api = BuildConfig.API_KEY;
 
+    private static final String movieApi = "https://api.themoviedb.org/3/movie";
+    public static URL buildURL(String movieData){
 
-    public static URL buildURL(String movieData,Context context){
-
-        Uri builtUi = Uri.parse(movieData).buildUpon().appendQueryParameter("api_key",api).build();
+        Uri builtUri = Uri.parse(movieData).buildUpon().appendQueryParameter("api_key",api).build();
         URL url = null;
         try{
-            url = new URL(builtUi.toString());
+            url = new URL(builtUri.toString());
 
         }catch (MalformedURLException e){
             e.printStackTrace();
         }
         return url;
 
+    }
+    public static URL buildURLMovieTrailers(String id){
+        Uri builtUri = Uri.parse(movieApi).buildUpon().appendPath(id).appendPath("videos").appendQueryParameter("api_key",api).build();
+        URL url = null;
+        try{
+            url = new URL(builtUri.toString());
+
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+        return  url;
+    }
+    public static URL buildURLMovieReviews(String id){
+        Uri builtUri = Uri.parse(movieApi).buildUpon().appendPath(id).appendPath("reviews").appendQueryParameter("api_key",api).build();
+        URL url = null;
+        try{
+            url = new URL(builtUri.toString());
+
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+        return  url;
     }
     public static  String getDataFromAPI(URL url) throws IOException{
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

@@ -13,12 +13,14 @@ public class MovieData implements Parcelable {
     String originalTitle;
     String plot;
     String userRating;
-    public MovieData(String imageLink,String releaseDate,String originalTitle,String plot,String userRating){
+    String id;
+    public MovieData(String imageLink,String releaseDate,String originalTitle,String plot,String userRating,String id){
         this.imageLink = imageLink;
         this.releaseDate = releaseDate;
         this.originalTitle = originalTitle;
         this.plot = plot;
         this.userRating = userRating;
+        this.id = id;
     }
     private MovieData(Parcel in){
         imageLink = in.readString();
@@ -26,6 +28,7 @@ public class MovieData implements Parcelable {
         originalTitle = in.readString();
         plot = in.readString();
         userRating = in.readString();
+        id = in.readString();
     }
 
     @Override
@@ -40,6 +43,7 @@ public class MovieData implements Parcelable {
             parcel.writeString(originalTitle);
             parcel.writeString(plot);
             parcel.writeString(userRating);
+            parcel.writeString(id);
     }
     public final static Parcelable.Creator<MovieData> CREATOR = new Parcelable.Creator<MovieData>(){
 

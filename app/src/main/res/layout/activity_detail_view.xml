@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:orientation="vertical"
-    tools:context="com.example.maikhoi.movieproject.DetailView">
+    tools:context="com.example.maikhoi.movieproject.DetailViewActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -42,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_toEndOf="@+id/movie_poster_detail"
+        android:layout_toRightOf="@+id/movie_poster_detail"
         android:layout_below="@id/original_title"
         />
 
@@ -55,21 +55,65 @@
         android:paddingRight="10sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/movie_poster_detail"
+        android:layout_toRightOf="@id/movie_poster_detail"
         android:layout_below="@id/date_release_display"
         android:textSize="20sp"
          />
+     <Button
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:id="@+id/favourite_button"
+         android:textSize="20sp"
+         android:layout_toRightOf="@id/movie_poster_detail"
+         android:layout_below="@id/user_rating"
+
+         android:text="@string/favourite_button"
+         android:paddingLeft="10sp"/>
 
     <TextView
         android:id="@+id/plot_synopsis"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/movie_poster_detail"
-        android:textSize="15sp"
+        android:textSize="18sp"
         android:paddingTop="10dp"
         android:paddingLeft="10sp"
         android:paddingRight="10sp"
       />
+     <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:id="@+id/trailer_text"
+         android:textSize="20sp"
+         android:text="@string/trailer_text"
+         android:paddingTop="10dp"
+         android:paddingLeft="10sp"
+         android:layout_below="@id/plot_synopsis"/>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:layout_below="@+id/trailer_text"
+            android:id="@+id/recycler_view_trailer">
+
+        </android.support.v7.widget.RecyclerView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/reviews_text"
+            android:textSize="20sp"
+            android:text="@string/reviews_text"
+            android:paddingTop="10dp"
+            android:paddingLeft="10sp"
+            android:layout_below="@id/recycler_view_trailer"/>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:layout_below="@+id/reviews_text"
+            android:id="@+id/recycler_view_review"></android.support.v7.widget.RecyclerView>
     </RelativeLayout>
     </ScrollView>
 

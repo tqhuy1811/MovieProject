@@ -3,6 +3,11 @@
     <string name="poster_image">PosterImage</string>
     <string name="top_rated">Top Rated</string>
     <string name="most_popular">Most Popular</string>
+    <string name="trailer_text">Trailers:</string>
+    <string name="favourite_button">Mark As Favourite</string>
+    <string name="favourite_menu_sorted">Favourite</string>
+    <string name="reviews_text">Reviews:</string>
+    <string name="favourite_button_second_stage">Saved</string>
 
 
 </resources>
