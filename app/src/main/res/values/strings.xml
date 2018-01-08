@@ -1,13 +1,18 @@
 <resources>
     <string name="app_name">MovieProject</string>
-    <string name="poster_image">PosterImage</string>
+    <string name="poster_image" translatable="false">PosterImage</string>
     <string name="top_rated">Top Rated</string>
     <string name="most_popular">Most Popular</string>
     <string name="trailer_text">Trailers:</string>
     <string name="favourite_button">Mark As Favourite</string>
-    <string name="favourite_menu_sorted">Favourite</string>
+    <string name="favourite_menu_sorted">Favorite</string>
     <string name="reviews_text">Reviews:</string>
     <string name="favourite_button_second_stage">Saved</string>
-
+    <string name="api_popular" translatable="false">http://api.themoviedb.org/3/movie/popular?</string>
+    <string name="api_top_rated" translatable="false">http://api.themoviedb.org/3/movie/top_rated?</string>
+    <string name="movie_data_transfer_api" translatable="false">DATA</string>
+    <string name="url_youtube" translatable="false">https://www.youtube.com/watch</string>
+    <string name="movie_data_transfer_db" translatable="false">DATA_DB</string>
+    <string name="movie_detail_screen">Movie Detail</string>
 
 </resources>

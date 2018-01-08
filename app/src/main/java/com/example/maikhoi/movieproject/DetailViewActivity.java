@@ -32,6 +32,7 @@ import java.net.URL;
     private TextView userRating;
     private String id;
     private MovieData data;
+
     private RecyclerView trailer;
     private LinearLayoutManager layoutManager;
     private MovieTrailerAdapter movieTrailerAdapter;
@@ -51,9 +52,10 @@ import java.net.URL;
         plot = findViewById(R.id.plot_synopsis);
         original_title = findViewById(R.id.original_title);
         userRating = findViewById(R.id.user_rating);
-        setTitle("Movie Detail");
+        setTitle(getString(R.string.movie_detail_screen));
         if(getIntent()!=null){
-        data = getIntent().getParcelableExtra("DATA");
+        data = getIntent().getParcelableExtra(getString(R.string.movie_data_transfer_api));
+
         if(data!=null){
             Picasso.with(this).load("http://image.tmdb.org/t/p/w342/"+data.imageLink).into(poster_display);
             release_date.setText(data.releaseDate);
@@ -104,7 +106,7 @@ import java.net.URL;
     public void onClick(MovieDataTrailers movieDataTrailers) {
         String url = "https://www.youtube.com/watch";
         Uri webpage = Uri.parse(url).buildUpon().appendQueryParameter("v",movieDataTrailers.key).build();
-        Log.i("INFO",webpage.toString());
+
         Intent intent = new Intent(Intent.ACTION_VIEW,webpage);
         if(intent.resolveActivity(getPackageManager())!=null){
             startActivity(intent);

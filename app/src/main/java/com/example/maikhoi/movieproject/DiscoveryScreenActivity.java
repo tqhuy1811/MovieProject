@@ -28,15 +28,17 @@ import com.example.maikhoi.movieproject.MoviePosterAdapter.MoviePosterAdapterOnC
 
 import java.net.URL;
 
-public class DiscoveryScreenActivity extends AppCompatActivity implements MoviePosterAdapterOnClickHandler,LoaderCallbacks<Cursor>{
+public class DiscoveryScreenActivity extends AppCompatActivity implements MoviePosterAdapterOnClickHandler,LoaderCallbacks<Cursor>,CustomCursorMovieAdapter.MovieDBOnClickHandler{
     private RecyclerView recyclerView;
-    private RecyclerView recyclerViewCursor;
+
     private GridLayoutManager layoutManager;
-    private GridLayoutManager layoutManagerCursor;
+
     private MoviePosterAdapter movieAdapter;
     private String choice;
-    private boolean internetState;
+    private LoaderCallbacks<MovieData[]> callbacks;
+
     private final static int LOADER_UNIQUE_ID = 18;
+    private final static int LOADER_UNIQUE_ID_DATA = 20;
 
 
     private final static String apiPopular = "http://api.themoviedb.org/3/movie/popular?";
@@ -48,30 +50,19 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery_screen);
-        setTitle("Pop Movie");
+        setTitle(getString(R.string.most_popular));
         recyclerView = findViewById(R.id.recycler_view);
-        recyclerViewCursor = findViewById(R.id.recycler_view_cursor);
-
         layoutManager = new GridLayoutManager(DiscoveryScreenActivity.this, 2);
-        layoutManagerCursor = new GridLayoutManager(DiscoveryScreenActivity.this,2);
-
-        internetState =checkInternetConnection();
-
-
-
         recyclerView.setHasFixedSize(true);
-        recyclerViewCursor.setHasFixedSize(true);
-        recyclerViewCursor.setLayoutManager(layoutManagerCursor);
-
         recyclerView.setLayoutManager(layoutManager);
-
         movieAdapter = new MoviePosterAdapter(DiscoveryScreenActivity.this, this);
-        customCursorMovieAdapter = new CustomCursorMovieAdapter(this);
-        recyclerViewCursor.setAdapter(customCursorMovieAdapter);
+        customCursorMovieAdapter = new CustomCursorMovieAdapter(this,this);
         recyclerView.setAdapter(movieAdapter);
 
         choice = apiPopular;
-        returnData(choice);
+
+        getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+
 
     }
 
@@ -87,21 +78,23 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.popular_sorted:
-               
+               recyclerView.setAdapter(movieAdapter);
                 choice = apiPopular;
-               returnData(choice);
+                getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
 
-                setTitle("Pop Movie");
+
+                setTitle(getString(R.string.most_popular));
                 return true;
             case R.id.top_rated:
-
+                recyclerView.setAdapter(movieAdapter);
                 choice = apiTopRated;
-                returnData(choice);
 
-                setTitle("Top Rated");
+                getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+                setTitle(R.string.top_rated);
                 return true;
             case R.id.favourite_list:
-                setTitle("Favourite");
+                setTitle(R.string.favourite_menu_sorted);
+                recyclerView.setAdapter(customCursorMovieAdapter);
 
                 getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID,null,this);
                 return true;
@@ -112,7 +105,57 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
     }
 
 
+    public LoaderCallbacks<MovieData[]> movieDataLoader(){
+        callbacks = new LoaderCallbacks<MovieData[]>() {
+            @Override
+            public android.support.v4.content.Loader<MovieData[]> onCreateLoader(int id, Bundle args) {
+                return new AsyncTaskLoader<MovieData[]>(getBaseContext()) {
+                    MovieData[] cachedData = null;
 
+                    @Override
+                    protected void onStartLoading() {
+                        if(cachedData != null){
+                            deliverResult(cachedData);
+                        }
+                        else{
+                            forceLoad();;
+                        }
+                    }
+
+                    @Override
+                    public MovieData[] loadInBackground() {
+                        String url = choice;
+                        URL getURL = MovieDBAPI_Wrapper.buildURL(url);
+                        try{
+                            String json = MovieDBAPI_Wrapper.getDataFromAPI(getURL);
+                            MovieData[] data = MovieDBJSONHelper.getDataFromMovieDB(json);
+                            return data;
+
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            return null;
+                        }
+
+                    }
+                    public void deliverResult(MovieData[] data){
+                        cachedData = data;
+                        super.deliverResult(data);
+                    }
+                };
+            }
+
+            @Override
+            public void onLoadFinished(android.support.v4.content.Loader<MovieData[]> loader, MovieData[] data) {
+                        movieAdapter.setImageData(data);
+            }
+
+            @Override
+            public void onLoaderReset(android.support.v4.content.Loader<MovieData[]> loader) {
+
+            }
+        };
+        return  callbacks;
+    }
 
     private boolean checkInternetConnection(){
         Context context = DiscoveryScreenActivity.this;
@@ -125,14 +168,12 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
         return isConnected;
 
     }
-    public void returnData(String url){
-        new FetchData().execute(url);
-    }
+
 
     @Override
     public void onClick(MovieData movieData) {
         Intent intent = new Intent(DiscoveryScreenActivity.this, DetailViewActivity.class);
-        intent.putExtra("DATA", movieData);
+        intent.putExtra(getString(R.string.movie_data_transfer_api), movieData);
 
         startActivity(intent);
     }
@@ -179,32 +220,28 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
             customCursorMovieAdapter.swapCursor(null);
     }
 
-    public class FetchData extends AsyncTask<String,Void,MovieData[]> {
 
-        @Override
-        protected MovieData[] doInBackground(String... urls) {
-            if (urls.length==0) return null;
-            String url = urls[0];
-            URL getURL = MovieDBAPI_Wrapper.buildURL(url);
-            try{
-                String json = MovieDBAPI_Wrapper.getDataFromAPI(getURL);
-                MovieData[] data = MovieDBJSONHelper.getDataFromMovieDB(json);
-                return data;
+    @Override
+    public void onClickDB(Cursor cursor, int position) {
+//        int imageLink = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_POSTER);
+//        int id = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID);
+//        int releaseDate = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_RELEASE_DATE);
+//        int title = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_TITLE);
+//        int userRating = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_USER_RATING);
+//        int plot = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_PLOT);
+//        cursor.moveToPosition(position)
+//        String imageDB = cursor.getString(imageLink);
+//        String idDB = cursor.getString(id);
+//        String releaseDateDB = cursor.getString(releaseDate);
+//        String titleDB = cursor.getString(title);
+//        String userRatingDB = cursor.getString(userRating);
+//        String plotDB = cursor.getString(plot);
+//        MovieData movieData = new MovieData(imageDB,releaseDateDB,titleDB,plotDB,userRatingDB,idDB);
+        Intent intent = new Intent(DiscoveryScreenActivity.this, DetailViewActivity.class);
+//        intent.putExtra(getString(R.string.movie_data_transfer_db),movieData);
+        startActivity(intent);
 
-            }catch(Exception e){
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(MovieData[] data) {
-            super.onPostExecute(data);
-            movieAdapter.setImageData(data);
-        }
     }
-
-
 }
 
 

@@ -18,8 +18,15 @@ import com.squareup.picasso.Picasso;
 public class CustomCursorMovieAdapter extends RecyclerView.Adapter<CustomCursorMovieAdapter.CursorMovieDataHolder> {
     private Cursor mCursor;
     private Context mContext;
-    public CustomCursorMovieAdapter(Context mContext){
+    private final MovieDBOnClickHandler movieDBOnClickHandler;
+    public CustomCursorMovieAdapter(Context mContext, MovieDBOnClickHandler movieDBOnClickHandler){
         this.mContext = mContext;
+        this.movieDBOnClickHandler = movieDBOnClickHandler;
+    }
+
+
+    public interface MovieDBOnClickHandler {
+        void onClickDB(Cursor cursor,int position);
     }
 
     @Override
@@ -58,11 +65,19 @@ public class CustomCursorMovieAdapter extends RecyclerView.Adapter<CustomCursorM
         return temp;
     }
 
-    public class CursorMovieDataHolder extends RecyclerView.ViewHolder{
+    public class CursorMovieDataHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView poster;
         public CursorMovieDataHolder(View itemView) {
             super(itemView);
             poster = itemView.findViewById(R.id.poster_display_image);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            movieDBOnClickHandler.onClickDB(mCursor,adapterPosition);
+
+
         }
     }
 }
