@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,16 +33,23 @@ import java.net.URL;
     private TextView plot;
     private TextView original_title;
     private TextView userRating;
-    private String id;
+    private  String ID;
     private MovieData data;
-
+    private MovieData dataFromDB;
     private RecyclerView trailer;
     private LinearLayoutManager layoutManager;
     private MovieTrailerAdapter movieTrailerAdapter;
     private RecyclerView reviews;
-    private LinearLayoutManager layoutManagerReviews;
+    private  LinearLayoutManager layoutManagerReviews;
     private MovieReviewsAdapter movieReviewsAdapter;
     private Button saveToDataBase;
+    private  LoaderManager.LoaderCallbacks<MovieDataTrailers[]> callbacksTrailers;
+    private  LoaderManager.LoaderCallbacks<MovieReviewsData[]> callbacksReviews;
+    private final static int LOADER_UNIQUE_ID_TRAILERS = 18;
+    private final static int LOADER_UNIQUE_ID_REVIEWS = 20;
+    private static boolean checkSavedData;
+    private static boolean hideButton = false;
+
 
 
     @Override
@@ -52,38 +62,54 @@ import java.net.URL;
         plot = findViewById(R.id.plot_synopsis);
         original_title = findViewById(R.id.original_title);
         userRating = findViewById(R.id.user_rating);
+
         setTitle(getString(R.string.movie_detail_screen));
         if(getIntent()!=null){
         data = getIntent().getParcelableExtra(getString(R.string.movie_data_transfer_api));
-
+        dataFromDB = getIntent().getParcelableExtra(getString(R.string.movie_data_transfer_db));
+        hideButton = Boolean.valueOf(getIntent().getStringExtra(getString(R.string.button_hide)));
         if(data!=null){
-            Picasso.with(this).load("http://image.tmdb.org/t/p/w342/"+data.imageLink).into(poster_display);
+            Picasso.with(this).load(getString(R.string.image_link)+data.imageLink).into(poster_display);
             release_date.setText(data.releaseDate);
-            id = data.id;
+            ID = data.id;
             plot.setText(data.plot);
             original_title.setText(data.originalTitle);
             userRating.setText(data.userRating);
         }
+        if(dataFromDB != null){
+            Picasso.with(this).load(getString(R.string.image_link)+dataFromDB.imageLink).into(poster_display);
+            release_date.setText(dataFromDB.releaseDate);
+            ID = dataFromDB.id;
+            plot.setText(dataFromDB.plot);
+            original_title.setText(dataFromDB.originalTitle);
+            userRating.setText(dataFromDB.userRating);
+        }
         }
         saveToDataBase = findViewById(R.id.favourite_button);
+        if(hideButton){
+            saveToDataBase.setVisibility(View.INVISIBLE);
+        }
         saveToDataBase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_POSTER,data.imageLink);
-                contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_PLOT,data.plot);
-                contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,data.releaseDate);
-                contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_TITLE,data.originalTitle);
-                contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID,data.id);
-                contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_USER_RATING,data.userRating);
-                Uri uri = getContentResolver().insert(MovieDataEntry.MovieEntry.CONTENT_URI , contentValues);
-                if(uri!=null){
-                    Toast.makeText(getBaseContext(),uri.toString(),Toast.LENGTH_LONG).show();
-                }
-                finish();
+            if(saveToDataBase.isPressed()){
+                saveToDataBase.setText(getString(R.string.favourite_button_second_stage));
+                checkSavedData = saveToDataBase.isPressed();
+                saveDataToDB();
+            }
 
+//
             }
         });
+        if(savedInstanceState != null){
+            checkSavedData = savedInstanceState.getBoolean(getString(R.string.boolean_check));
+            if(checkSavedData==true){
+                saveToDataBase.setText(getString(R.string.favourite_button_second_stage));
+            }
+
+
+        }
+
         trailer = findViewById(R.id.recycler_view_trailer);
         layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         trailer.setLayoutManager(layoutManager);
@@ -91,20 +117,22 @@ import java.net.URL;
         movieTrailerAdapter = new MovieTrailerAdapter(this
         ,this);
         trailer.setAdapter(movieTrailerAdapter);
-        new FetchTrailerData().execute(id);
+        loaderDataTrailers();
+        getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_TRAILERS,null,callbacksTrailers);
         reviews = findViewById(R.id.recycler_view_review);
         layoutManagerReviews = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         reviews.setLayoutManager(layoutManagerReviews);
         reviews.setHasFixedSize(true);
         movieReviewsAdapter = new MovieReviewsAdapter();
         reviews.setAdapter(movieReviewsAdapter);
-        new FetchReviewsData().execute(id);
+        loaderDataReviews();
+        getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_REVIEWS,null,callbacksReviews);
 
     }
 
     @Override
     public void onClick(MovieDataTrailers movieDataTrailers) {
-        String url = "https://www.youtube.com/watch";
+        String url = getString(R.string.url_youtube);
         Uri webpage = Uri.parse(url).buildUpon().appendQueryParameter("v",movieDataTrailers.key).build();
 
         Intent intent = new Intent(Intent.ACTION_VIEW,webpage);
@@ -115,58 +143,137 @@ import java.net.URL;
 
     }
 
-
-    public class FetchTrailerData extends AsyncTask<String,Void,MovieDataTrailers[]>{
-
         @Override
-        protected MovieDataTrailers[] doInBackground(String... urls) {
-            if (urls.length==0) return null;
-            String id = urls[0];
-            URL getURL = MovieDBAPI_Wrapper.buildURLMovieTrailers(id);
-            try{
-                String json = MovieDBAPI_Wrapper.getDataFromAPI(getURL);
-                MovieDataTrailers[] data = MovieDBJSONHelper.getYouTubeLinks(json);
-                return data;
-
-            }catch(Exception e){
-                e.printStackTrace();
-                return null;
-            }
-
+        protected void onRestoreInstanceState(Bundle savedInstanceState) {
+            checkSavedData = savedInstanceState.getBoolean(getString(R.string.boolean_check));
         }
 
         @Override
-        protected void onPostExecute(MovieDataTrailers[] movieDataTrailers) {
-            super.onPostExecute(movieDataTrailers);
-            movieTrailerAdapter.setTrailersData(movieDataTrailers);
-        }
-    }
-    public class FetchReviewsData extends AsyncTask<String,Void,MovieReviewsData[]>{
-
-        @Override
-        protected MovieReviewsData[] doInBackground(String... urls) {
-            if (urls.length==0) return null;
-            String id = urls[0];
-            URL getURL = MovieDBAPI_Wrapper.buildURLMovieReviews(id);
-            try{
-                String json = MovieDBAPI_Wrapper.getDataFromAPI(getURL);
-                MovieReviewsData[] data = MovieDBJSONHelper.getReviewsData(json);
-                return data;
-
-            }catch(Exception e){
-                e.printStackTrace();
-                return null;
-            }
-
+        protected void onSaveInstanceState(Bundle outState) {
+            outState.putBoolean(getString(R.string.boolean_check),checkSavedData);
+            super.onSaveInstanceState(outState);
         }
 
-        @Override
-        protected void onPostExecute(MovieReviewsData[] movieReviewsData) {
-            super.onPostExecute(movieReviewsData);
-            movieReviewsAdapter.setReviewsData(movieReviewsData);
-        }
+        public void saveDataToDB(){
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_POSTER,data.imageLink);
+        contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_PLOT,data.plot);
+        contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,data.releaseDate);
+        contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_TITLE,data.originalTitle);
+        contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID,data.id);
+        contentValues.put(MovieDataEntry.MovieEntry.COLUMN_MOVIE_USER_RATING,data.userRating);
+        Uri uri = getContentResolver().insert(MovieDataEntry.MovieEntry.CONTENT_URI , contentValues);
     }
 
 
 
-}
+    private  LoaderManager.LoaderCallbacks<MovieDataTrailers[]> loaderDataTrailers(){
+        callbacksTrailers = new LoaderManager.LoaderCallbacks<MovieDataTrailers[]>() {
+            @Override
+            public Loader<MovieDataTrailers[]> onCreateLoader(int id, Bundle args) {
+                return new AsyncTaskLoader<MovieDataTrailers[]>(getBaseContext()) {
+                    MovieDataTrailers[] cachedData = null;
+
+                    @Override
+                    protected void onStartLoading() {
+                        if(cachedData != null){
+                            deliverResult(cachedData);
+                        }
+                        else{
+                            forceLoad();
+                        }
+                    }
+
+                    @Override
+                    public MovieDataTrailers[] loadInBackground() {
+                        URL getURL = MovieDBAPI_Wrapper.buildURLMovieTrailers(ID);
+                        try{
+                            String json = MovieDBAPI_Wrapper.getDataFromAPI(getURL);
+                            MovieDataTrailers[] data = MovieDBJSONHelper.getYouTubeLinks(json);
+                            return data;
+
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+                    public void deliverResult(MovieDataTrailers[] dataTrailers){
+                        cachedData = dataTrailers;
+                        super.deliverResult(dataTrailers);
+                    }
+                };
+            }
+
+            @Override
+            public void onLoadFinished(Loader<MovieDataTrailers[]> loader, MovieDataTrailers[] data) {
+                movieTrailerAdapter.setTrailersData(data);
+
+            }
+
+            @Override
+            public void onLoaderReset(Loader<MovieDataTrailers[]> loader) {
+
+            }
+        };
+        return callbacksTrailers;
+        }
+
+    private LoaderManager.LoaderCallbacks<MovieReviewsData[]> loaderDataReviews(){
+        callbacksReviews = new LoaderManager.LoaderCallbacks<MovieReviewsData[]>() {
+            @Override
+            public Loader<MovieReviewsData[]> onCreateLoader(int id, Bundle args) {
+                return new AsyncTaskLoader<MovieReviewsData[]>(getBaseContext()) {
+                    MovieReviewsData[] cacheData = null;
+
+                    @Override
+                    protected void onStartLoading() {
+                        if(cacheData!=null){
+                            deliverResult(cacheData);
+                        }
+                        else{
+                            forceLoad();;
+                        }
+                    }
+
+                    @Override
+                    public MovieReviewsData[] loadInBackground() {
+                        URL getURL = MovieDBAPI_Wrapper.buildURLMovieReviews(ID);
+                        try{
+                            String json = MovieDBAPI_Wrapper.getDataFromAPI(getURL);
+                            MovieReviewsData[] data = MovieDBJSONHelper.getReviewsData(json);
+                            return data;
+
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    public void deliverResult(MovieReviewsData[] data) {
+                        cacheData = data;
+                        super.deliverResult(data);
+                    }
+                };
+            }
+
+            @Override
+            public void onLoadFinished(Loader<MovieReviewsData[]> loader, MovieReviewsData[] data) {
+                movieReviewsAdapter.setReviewsData(data);
+
+            }
+
+            @Override
+            public void onLoaderReset(Loader<MovieReviewsData[]> loader) {
+
+            }
+        };
+        return callbacksReviews;
+    }
+
+    }
+
+
+
+

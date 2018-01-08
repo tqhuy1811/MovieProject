@@ -223,22 +223,25 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
 
     @Override
     public void onClickDB(Cursor cursor, int position) {
-//        int imageLink = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_POSTER);
-//        int id = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID);
-//        int releaseDate = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_RELEASE_DATE);
-//        int title = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_TITLE);
-//        int userRating = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_USER_RATING);
-//        int plot = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_PLOT);
-//        cursor.moveToPosition(position)
-//        String imageDB = cursor.getString(imageLink);
-//        String idDB = cursor.getString(id);
-//        String releaseDateDB = cursor.getString(releaseDate);
-//        String titleDB = cursor.getString(title);
-//        String userRatingDB = cursor.getString(userRating);
-//        String plotDB = cursor.getString(plot);
-//        MovieData movieData = new MovieData(imageDB,releaseDateDB,titleDB,plotDB,userRatingDB,idDB);
+
+        int imageLink = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_POSTER);
+        int id = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID);
+        int releaseDate = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_RELEASE_DATE);
+        int title = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_TITLE);
+        int userRating = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_USER_RATING);
+        int plot = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_PLOT);
+        cursor.moveToPosition(position);
+        String imageDB = cursor.getString(imageLink);
+        String idDB = cursor.getString(id);
+        String releaseDateDB = cursor.getString(releaseDate);
+        String titleDB = cursor.getString(title);
+        String userRatingDB = cursor.getString(userRating);
+        String plotDB = cursor.getString(plot);
+
+        MovieData movieData = new MovieData(imageDB,releaseDateDB,titleDB,plotDB,userRatingDB,idDB);
         Intent intent = new Intent(DiscoveryScreenActivity.this, DetailViewActivity.class);
-//        intent.putExtra(getString(R.string.movie_data_transfer_db),movieData);
+        intent.putExtra(getString(R.string.movie_data_transfer_db),movieData);
+        intent.putExtra(getString(R.string.button_hide),"true");
         startActivity(intent);
 
     }

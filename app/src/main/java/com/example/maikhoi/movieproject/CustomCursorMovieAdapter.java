@@ -3,6 +3,7 @@ package com.example.maikhoi.movieproject;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,7 @@ public class CustomCursorMovieAdapter extends RecyclerView.Adapter<CustomCursorM
         String link = mCursor.getString(imageLink);
 
 
-        Picasso.with(mContext).load("http://image.tmdb.org/t/p/w780/"+link).into(holder.poster);
+        Picasso.with(mContext).load(mContext.getString(R.string.image_link)+link).into(holder.poster);
 
     }
 
@@ -70,11 +71,13 @@ public class CustomCursorMovieAdapter extends RecyclerView.Adapter<CustomCursorM
         public CursorMovieDataHolder(View itemView) {
             super(itemView);
             poster = itemView.findViewById(R.id.poster_display_image);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
+
             movieDBOnClickHandler.onClickDB(mCursor,adapterPosition);
 
 

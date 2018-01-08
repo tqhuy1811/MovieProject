@@ -39,7 +39,7 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
 
     @Override
     public void onBindViewHolder(ImageHolder holder, int position) {
-        Picasso.with(context).load("http://image.tmdb.org/t/p/w780/"+movieData[position].imageLink).into(holder.movie_poster);
+        Picasso.with(context).load(context.getString(R.string.image_link)+movieData[position].imageLink).into(holder.movie_poster);
     }
 
     @Override

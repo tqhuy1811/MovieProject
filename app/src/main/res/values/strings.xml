@@ -4,7 +4,7 @@
     <string name="top_rated">Top Rated</string>
     <string name="most_popular">Most Popular</string>
     <string name="trailer_text">Trailers:</string>
-    <string name="favourite_button">Mark As Favourite</string>
+    <string name="favourite_button">Mark As Favorite</string>
     <string name="favourite_menu_sorted">Favorite</string>
     <string name="reviews_text">Reviews:</string>
     <string name="favourite_button_second_stage">Saved</string>
@@ -14,5 +14,7 @@
     <string name="url_youtube" translatable="false">https://www.youtube.com/watch</string>
     <string name="movie_data_transfer_db" translatable="false">DATA_DB</string>
     <string name="movie_detail_screen">Movie Detail</string>
-
+    <string name="boolean_check" translatable="false">BOOLEAN_CHECKED</string>
+    <string name="button_hide" translatable="false">BUTTON_HIDE</string>
+    <string name="image_link" translatable="false">http://image.tmdb.org/t/p/w342/</string>
 </resources>
