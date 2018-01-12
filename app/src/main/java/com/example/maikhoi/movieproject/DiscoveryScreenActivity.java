@@ -10,6 +10,7 @@ import android.graphics.Movie;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
@@ -36,7 +37,7 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
     private MoviePosterAdapter movieAdapter;
     private String choice;
     private LoaderCallbacks<MovieData[]> callbacks;
-
+    private Parcelable savedState;
     private final static int LOADER_UNIQUE_ID = 18;
     private final static int LOADER_UNIQUE_ID_DATA = 20;
     private static String statedChecked;
@@ -88,18 +89,27 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
 
     }
 
+
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         statedChecked = savedInstanceState.getString(getString(R.string.menu_title));
         choice = savedInstanceState.getString(getString(R.string.api_checked));
+        savedState = savedInstanceState.getParcelable("TEST");
         super.onRestoreInstanceState(savedInstanceState);
     }
 
+    public void restoreSaveState(){
+        if (savedState != null) {
+            recyclerView.getLayoutManager().onRestoreInstanceState(savedState);
+        }
+
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(getString(R.string.menu_title),statedChecked);
         outState.putString(getString(R.string.api_checked),choice);
-
+        outState.putParcelable("TEST",recyclerView.getLayoutManager().onSaveInstanceState());
         super.onSaveInstanceState(outState);
     }
 
@@ -188,6 +198,7 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
             @Override
             public void onLoadFinished(android.support.v4.content.Loader<MovieData[]> loader, MovieData[] data) {
                         movieAdapter.setImageData(data);
+                        restoreSaveState();
             }
 
             @Override
