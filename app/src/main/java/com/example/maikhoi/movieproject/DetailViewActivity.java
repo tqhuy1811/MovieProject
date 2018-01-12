@@ -94,14 +94,15 @@ import java.net.URL;
             saveToDataBase.setVisibility(View.INVISIBLE);
         }
         checkedForMovieDB();
-//        if (cursorChecked != null){
-//            saveToDataBase.setText(getString(R.string.favourite_button_second_stage));
-//        }
+        if(cursorChecked != null){
+        if (cursorChecked.getCount() != 0){
+            saveToDataBase.setText(getString(R.string.favourite_button_second_stage));
+        }}
         saveToDataBase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            if(cursorChecked == null){
-
+            if(cursorChecked.getCount() != 1){
+                saveToDataBase.setText(getString(R.string.favourite_button_second_stage));
                 checkSavedData = saveToDataBase.isPressed();
                 saveDataToDB();
             }
@@ -201,9 +202,7 @@ import java.net.URL;
             String[] mSelectionArgs = new String[]{id};
            cursorChecked = getContentResolver().query(uri,mProjection,mSelection,mSelectionArgs,null);
             }
-            int i = cursorChecked.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID);
 
-            Log.i("INFO",String.valueOf(i));
 
         return  cursorChecked;
     }
