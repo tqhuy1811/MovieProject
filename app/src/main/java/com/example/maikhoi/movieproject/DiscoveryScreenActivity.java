@@ -63,7 +63,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
             choice = savedInstanceState.getString(getString(R.string.api_checked));
             statedChecked = savedInstanceState.getString(getString(R.string.menu_title));
             if(statedChecked == getString(R.string.most_popular)){
-
                 recyclerView.setAdapter(movieAdapter);
                 getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
                 setTitle(statedChecked);
@@ -72,7 +71,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
                 recyclerView.setAdapter(movieAdapter);
                 getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
                 setTitle(statedChecked);
-
             }
             else  if(statedChecked == getString(R.string.favourite_menu_sorted)){
                 recyclerView.setAdapter(customCursorMovieAdapter);
@@ -80,13 +78,14 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
                 setTitle(statedChecked);
             }
         }
-
-        choice = apiPopular;
-        statedChecked = getTitle().toString();
-        getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
-        getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID,null,this);
-
-
+        else {
+            choice = apiPopular;
+            statedChecked = getTitle().toString();
+        }
+        if(checkInternetConnection()) {
+            getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA, null, movieDataLoader());
+        }
+        getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID, null, this);
     }
 
 
@@ -127,15 +126,12 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
                recyclerView.setAdapter(movieAdapter);
                 choice = apiPopular;
                 getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
-
-
                 setTitle(getString(R.string.most_popular));
                 statedChecked = getTitle().toString();
                 return true;
             case R.id.top_rated:
                 recyclerView.setAdapter(movieAdapter);
                 choice = apiTopRated;
-
                 getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
                 setTitle(R.string.top_rated);
                 statedChecked = getTitle().toString();
@@ -143,7 +139,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
             case R.id.favourite_list:
                 setTitle(R.string.favourite_menu_sorted);
                 recyclerView.setAdapter(customCursorMovieAdapter);
-
                 getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID,null,this);
                 statedChecked = getTitle().toString();
                 return true;
@@ -162,7 +157,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
             public android.support.v4.content.Loader<MovieData[]> onCreateLoader(int id, Bundle args) {
                 return new AsyncTaskLoader<MovieData[]>(getBaseContext()) {
                     MovieData[] cachedData = null;
-
                     @Override
                     protected void onStartLoading() {
                         if(cachedData != null){
@@ -172,7 +166,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
                             forceLoad();;
                         }
                     }
-
                     @Override
                     public MovieData[] loadInBackground() {
                         String url = choice;
@@ -218,7 +211,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
-
     }
 
 
@@ -226,7 +218,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
     public void onClick(MovieData movieData) {
         Intent intent = new Intent(DiscoveryScreenActivity.this, DetailViewActivity.class);
         intent.putExtra(getString(R.string.movie_data_transfer_api), movieData);
-
         startActivity(intent);
     }
 
@@ -275,7 +266,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
 
     @Override
     public void onClickDB(Cursor cursor, int position) {
-
         int imageLink = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_POSTER);
         int id = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID);
         int releaseDate = cursor.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_RELEASE_DATE);
@@ -295,7 +285,6 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
         intent.putExtra(getString(R.string.movie_data_transfer_db),movieData);
         intent.putExtra(getString(R.string.button_hide),"true");
         startActivity(intent);
-
     }
 }
 

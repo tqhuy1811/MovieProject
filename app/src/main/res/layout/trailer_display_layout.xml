@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="13sp"
+        android:paddingTop="13dp"
         android:id="@+id/movie_trailer_name"
         android:layout_toRightOf="@id/play_trailer"
         android:paddingLeft="10dp"/>
