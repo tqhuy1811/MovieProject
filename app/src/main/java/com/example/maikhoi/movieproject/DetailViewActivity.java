@@ -3,6 +3,7 @@ package com.example.maikhoi.movieproject;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
@@ -49,6 +50,7 @@ import java.net.URL;
     private final static int LOADER_UNIQUE_ID_REVIEWS = 20;
     private static boolean checkSavedData;
     private static boolean hideButton = false;
+    private static Cursor cursorChecked;
 
 
 
@@ -89,13 +91,21 @@ import java.net.URL;
         if(hideButton){
             saveToDataBase.setVisibility(View.INVISIBLE);
         }
+        checkedForMovieDB();
+//        if (cursorChecked != null){
+//            saveToDataBase.setText(getString(R.string.favourite_button_second_stage));
+//        }
         saveToDataBase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            if(saveToDataBase.isPressed()){
-                saveToDataBase.setText(getString(R.string.favourite_button_second_stage));
+            if(cursorChecked == null){
+
                 checkSavedData = saveToDataBase.isPressed();
                 saveDataToDB();
+            }
+            else{
+
+                Toast.makeText(DetailViewActivity.this,"You already saved this movie",Toast.LENGTH_SHORT).show();
             }
 
 //
@@ -167,6 +177,15 @@ import java.net.URL;
     }
 
 
+    public Cursor checkedForMovieDB(){
+            if(data!=null){
+            String id  = data.id.toString();
+            Uri uri = MovieDataEntry.MovieEntry.CONTENT_URI;
+            uri.buildUpon().appendPath(id).build();
+           cursorChecked = getContentResolver().query(uri,null,null,null,null);
+            }
+        return  cursorChecked;
+    }
 
     private  LoaderManager.LoaderCallbacks<MovieDataTrailers[]> loaderDataTrailers(){
         callbacksTrailers = new LoaderManager.LoaderCallbacks<MovieDataTrailers[]>() {

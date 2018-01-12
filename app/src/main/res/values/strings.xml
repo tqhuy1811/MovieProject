@@ -17,4 +17,6 @@
     <string name="boolean_check" translatable="false">BOOLEAN_CHECKED</string>
     <string name="button_hide" translatable="false">BUTTON_HIDE</string>
     <string name="image_link" translatable="false">http://image.tmdb.org/t/p/w342/</string>
+    <string name="menu_title" translatable="false">MENU_TITLE</string>
+    <string name="api_checked" translatable="false">API_CHECK</string>
 </resources>

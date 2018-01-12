@@ -47,6 +47,15 @@ public class MovieContentProvider extends ContentProvider {
                 returnCursor = db.query(MovieDataEntry.MovieEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
 
                 break;
+            case MOVIE_WITH_ID:
+                String id = uri.getPathSegments().get(1);
+                String mSelection = "id=?";
+                String[] mSelectionArgs = new String[]{id};
+                returnCursor = db.query(MovieDataEntry.MovieEntry.TABLE_NAME,projection,mSelection,mSelectionArgs,null,null,sortOrder);
+
+
+
+                break;
             default:
                 throw new UnsupportedOperationException();
         }

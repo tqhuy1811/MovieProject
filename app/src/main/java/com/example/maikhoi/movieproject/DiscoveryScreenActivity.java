@@ -39,7 +39,7 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
 
     private final static int LOADER_UNIQUE_ID = 18;
     private final static int LOADER_UNIQUE_ID_DATA = 20;
-
+    private static String statedChecked;
 
     private final static String apiPopular = "http://api.themoviedb.org/3/movie/popular?";
     private final static String apiTopRated = "http://api.themoviedb.org/3/movie/top_rated?";
@@ -58,14 +58,50 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
         movieAdapter = new MoviePosterAdapter(DiscoveryScreenActivity.this, this);
         customCursorMovieAdapter = new CustomCursorMovieAdapter(this,this);
         recyclerView.setAdapter(movieAdapter);
+        if(savedInstanceState!=null){
+            choice = savedInstanceState.getString(getString(R.string.api_checked));
+            statedChecked = savedInstanceState.getString(getString(R.string.menu_title));
+            if(statedChecked == getString(R.string.most_popular)){
+
+                recyclerView.setAdapter(movieAdapter);
+                getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+                setTitle(statedChecked);
+            }
+            else if(statedChecked == getString(R.string.top_rated)){
+                recyclerView.setAdapter(movieAdapter);
+                getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+                setTitle(statedChecked);
+
+            }
+            else  if(statedChecked == getString(R.string.favourite_menu_sorted)){
+                recyclerView.setAdapter(customCursorMovieAdapter);
+                getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+                setTitle(statedChecked);
+            }
+        }
 
         choice = apiPopular;
-
+        statedChecked = getTitle().toString();
         getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+        getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID,null,this);
 
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        statedChecked = savedInstanceState.getString(getString(R.string.menu_title));
+        choice = savedInstanceState.getString(getString(R.string.api_checked));
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(getString(R.string.menu_title),statedChecked);
+        outState.putString(getString(R.string.api_checked),choice);
+
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -80,29 +116,34 @@ public class DiscoveryScreenActivity extends AppCompatActivity implements MovieP
             case R.id.popular_sorted:
                recyclerView.setAdapter(movieAdapter);
                 choice = apiPopular;
-                getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+                getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
 
 
                 setTitle(getString(R.string.most_popular));
+                statedChecked = getTitle().toString();
                 return true;
             case R.id.top_rated:
                 recyclerView.setAdapter(movieAdapter);
                 choice = apiTopRated;
 
-                getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
+                getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID_DATA,null,movieDataLoader());
                 setTitle(R.string.top_rated);
+                statedChecked = getTitle().toString();
                 return true;
             case R.id.favourite_list:
                 setTitle(R.string.favourite_menu_sorted);
                 recyclerView.setAdapter(customCursorMovieAdapter);
 
-                getSupportLoaderManager().initLoader(LOADER_UNIQUE_ID,null,this);
+                getSupportLoaderManager().restartLoader(LOADER_UNIQUE_ID,null,this);
+                statedChecked = getTitle().toString();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
     }
+
+
 
 
     public LoaderCallbacks<MovieData[]> movieDataLoader(){
