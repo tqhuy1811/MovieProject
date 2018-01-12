@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +51,8 @@ import java.net.URL;
     private final static int LOADER_UNIQUE_ID_REVIEWS = 20;
     private static boolean checkSavedData;
     private static boolean hideButton = false;
-    private static Cursor cursorChecked;
+    private  Cursor cursorChecked;
+    private ScrollView scrollView;
 
 
 
@@ -60,7 +62,7 @@ import java.net.URL;
         setContentView(R.layout.activity_detail_view);
         poster_display =  findViewById(R.id.movie_poster_detail);
         release_date = findViewById(R.id.date_release_display);
-
+        scrollView = findViewById(R.id.scroll_view);
         plot = findViewById(R.id.plot_synopsis);
         original_title = findViewById(R.id.original_title);
         userRating = findViewById(R.id.user_rating);
@@ -152,15 +154,27 @@ import java.net.URL;
 
 
     }
-
+        //https://eliasbland.wordpress.com/2011/07/28/how-to-save-the-position-of-a-scrollview-when-the-orientation-changes-in-android/
         @Override
         protected void onRestoreInstanceState(Bundle savedInstanceState) {
             checkSavedData = savedInstanceState.getBoolean(getString(R.string.boolean_check));
+            final int[] position = savedInstanceState.getIntArray(getString(R.string.scroll_position));
+            if(position != null){
+                scrollView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        scrollView.scrollTo(position[0],position[1]);
+                    }
+                });
+            }
         }
+
+        //https://eliasbland.wordpress.com/2011/07/28/how-to-save-the-position-of-a-scrollview-when-the-orientation-changes-in-android/
 
         @Override
         protected void onSaveInstanceState(Bundle outState) {
             outState.putBoolean(getString(R.string.boolean_check),checkSavedData);
+            outState.putIntArray(getString(R.string.scroll_position),new int[]{scrollView.getScrollX(),scrollView.getScrollY()});
             super.onSaveInstanceState(outState);
         }
 
@@ -182,8 +196,15 @@ import java.net.URL;
             String id  = data.id.toString();
             Uri uri = MovieDataEntry.MovieEntry.CONTENT_URI;
             uri.buildUpon().appendPath(id).build();
-           cursorChecked = getContentResolver().query(uri,null,null,null,null);
+            String[] mProjection = {MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID};
+            String mSelection = MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID+"=?";
+            String[] mSelectionArgs = new String[]{id};
+           cursorChecked = getContentResolver().query(uri,mProjection,mSelection,mSelectionArgs,null);
             }
+            int i = cursorChecked.getColumnIndex(MovieDataEntry.MovieEntry.COLUMN_MOVIE_ID);
+
+            Log.i("INFO",String.valueOf(i));
+
         return  cursorChecked;
     }
 

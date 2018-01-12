@@ -19,4 +19,5 @@
     <string name="image_link" translatable="false">http://image.tmdb.org/t/p/w342/</string>
     <string name="menu_title" translatable="false">MENU_TITLE</string>
     <string name="api_checked" translatable="false">API_CHECK</string>
+    <string name="scroll_position" translatable="false">SCROLL_POSITION</string>
 </resources>
